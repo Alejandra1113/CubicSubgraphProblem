@@ -1,0 +1,104 @@
+\documentclass{article}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+
+\begin{document}
+
+\title{\textbf{Proyecto \#3 DAA:} La venganza de Alejandra}
+\author{L\'azaro Daniel Gonz\'alez Mart\'inez y Alejandra Monz\'on Pe\~na}
+
+\date{}
+\maketitle
+
+\section*{Desccripci\'on del problema}
+Dado un grafo $G$, eliminar aristas hasta que todos sus v\'ertices sean de grado $3$ o $0$, sin eliminarlas todas.\\ 
+
+Esto es equivalente a determinar si un grafo $G$ tiene un subgrafo $G^{'}$ regular de grado $3$. \\
+
+Los grafos regulares de grado $3$ se conocen tambi\'en como \textit{grafos c\'ubicos}, por lo que usaremos ambos t\'erminos indistintamente.
+
+\section*{Reducci\'on de 3-coloreable a subgrafo 3-regular}
+Primero, demostrar que el problema de subgrafo c\'ubico (CSP [cubic subgraph problem]) cumple $ CSP \subseteq NP$ es sencillo, ya que si tuvi\'esemos un grafo $G$ y conoci\'eramos 
+que aristas de \'el componen el subgrafo c\'ubico, basta con recorrer el conjunto $E$ de aristas a conservar del grafo $G$ como parte del subgrafo c\'ubico 
+y por cada par de v\'ertices sobre los que incide aumentar en $1$ su degree, finalmente basta con recorrer la lista de v\'ertices de $G$ y comprobar que todos tengan degree 
+$0$ o  $3$(y al menos se tuviera una arista), procedimiento cuyo costo ser\'ia $O(|V| + |E|)$, como existe una forma polin\'omica de comprobar si una instancia del problema realmente cumple con 
+la caracter\'istica deseada. Queda entonces demostrar que el problema $CSP = NP$.\\
+
+Para demostrar que el problema de determinar si un grafo tine un subgrafo c\'ubico es NP-completo, es necesario hacer una reducci\'on de un problema que sea NP-completo 
+a este problema; para esto utilizaremos el problema $3$-coloreable, ya que el problema de la 3-coloraci\'on de un grafo se demostr\'o NP-completo por Karps.\\
+
+Definamos t\'erminos a utilizar en la demostraci\'on: 
+\begin{itemize}
+    \item[$\ast $] $G$: grafo de entrada del problema 3-coloreable.
+    \item[$\ast $] $V(G)~ = ~\{v_1,~ v_2,~ ... ~, ~v_n\}$: v\'ertices de $G$.
+    \item[$\ast $] $E(G)~ = ~\{e_1, ~e_2,~ ...~ ,~ e_m\}$: aristas de $G$.
+    \item[$\ast $] $<u,v>$: Arista que conecta los v\'ertices $u$ y $v$
+    \item[$\ast $] $d(v_i)$: Grado del v\'ertice $v_i$
+    \item[$\ast $] $K^{'}_n$: Grafo completo de $n$ v\'ertices al que se le quita una arista(tiene todos los v\'ertices con degree n-1, excepto 2 v\'ertices de degree n-2)
+    \item[$\ast $] $3$-partici\'on de $V(G)$: Conjuntos $V_1$, $V_2$ y $V_3$, tales que $\bigcup_{i=1}^{3} ~V_i~ = ~V(G)$  y $V_i ~\cap~ V_j~ =~ \emptyset$ para todo $i~ \neq~ j$.
+\end{itemize}
+
+\textbf{Transformaci\'on de la entrada:}\\
+
+A partir del grafo $G$ se contruye un nuevo grafo $G'$ de la siguiente forma:\\ 
+
+1 - Por cada $v_i$ de $V(G)$ se crean $3$ ciclos $C_i^1$, $C_i^2$ y $C_i^3$, cada uno de longitud igual a $2 ~*~ d(v_i)~ + ~1$. Denotemos 
+los v\'ertces de cada ciclo $C_i^h$ como $c_{ij}^h$, $1~ \leq~i~\leq ~n$, $1~ \leq~d~\leq ~2 ~*~ d(v_i)~ + ~1$, $1~ \leq~h~\leq ~3$.\\ 
+
+2 - Por cada $e_j$ de $E(G)$ se crean $3$ subgrafos $D_{j}^1$, $D_{j}^2$ y $D_{j}^3$ en $G'$, donde cada $D_{j}^h$, $1~ \leq~h~\leq ~3$,  es un $K^{'}_4$, a los dos v\'ertices 
+de $D_{j}^h$ con grado $2$ los denotaremos como $x_{j}^h$ y $y_{j}^h$.\\
+
+3 - Por cada $e_j$, sean $v_s$ y $v_t$ los v\'ertices sobre los que incide en $G$, de los ciclos $C_s^h$ ($C_t^h$) se toman $2$ v\'ertices 
+$c_{s\alpha}^h$ y $c_{s\beta}^h$ ($c_{s\alpha}^h$ y $c_{s\beta}^h$) que aun tengan degree $2$; por cada $1~\leq ~h ~\leq~ 3$ se agragan a $G'$ las aristas: $<c_{s\alpha}^h, x_{j}^h>$, $<c_{s\beta}^h, y_{j}^h>$, 
+$<c_{t\alpha}^h, x_{j}^h>$ y $<c_{t\beta}^h, y_{j}^h>$.\\ 
+
+Una vez consideradas todas las aristas en el paso (3), se tiene que para cada ciclo $C_i^h$ ( $1~\leq ~i ~\leq~ n$, $1~\leq ~h ~\leq~ 3$ )
+solo queda un v\'ertice con degree $2$. Nombremos dichos v\'ertices como $w_i^h$.\\ 
+
+4 - Por cada $1~\leq ~i ~\leq~ n$, se construye un subgrafo $U_i$, que es un $K^{'}_4$ m\'as u v\'ertice al que denominaremos $u_{i}$, los v\'ertices de grado $2$ del $K^{'}_4$
+los denominaremos $x_{i}$ y $y_{i}$, el v\'ertice $u_i$ se une a los restantes del  $K^{'}_4$ mediante una arista $<x_{i},u_i>$.\\ 
+
+Se toman todos los grafos $U_i$ y se agregan a $G'$, junto con las aristas: $<u_i, w_i^1>$, $<y_i, w_i^2>$ y $<y_i, w_i^3>$. \\
+
+5 - Agregar el ciclo $C'$ de longitud $2~*~n$ a $G'$, conformado por los v\'ertices: $\{ a_{11}, ... , a_{1n}, a_{21}, ... , a_{2n} \}$ y agregar las aristas 
+$<a_{pi}, u_{i}>$ para $p = 1,2$.\\
+
+Construido $G'$, queda demostrar que en $G$ es $3$-coloreable si y solo si $G'$ tiene un subgrafo c\'ubico. \\ 
+
+($\Rightarrow$) Sea $G$ un grafo $3$-coloreable, y una $3$-partici\'on de $V(G)$ tal que en cada conjunto $V_i$ queden solo v\'ertices de una mismo 
+color de $G$, entonces existe un grafo $G'[H]$, subgrafo inducido de $G'$ que es $3$-regular, ya que siempre podemos tomar los v\'ertices de la siguiente forma:\\
+
+\begin{enumerate}
+    \item Todos los v\'ertices $a_{ij}$ est\'an en $V(H)$
+    \item Todos los v\'ertices $u_{i}$ est\'an en $V(H)$
+    \item Si $v_i$ de $G$ est\'a en el conjunto $V_c$ de la tricoloraci\'on, entonces los v\'ertices $c_{ij}$ del ciclo $C_i^c$ est\'an en $H$.
+    \item Si $c ~\neq ~1$ para el conjunto $V_c$ al que pertenece $v_i$, entonces los v\'ertices de $U_i$ pertenecen a $H$.
+    \item Si la arista $e_j$, es adyacente al v\'ertice $v_i$ que est\'a en el conjunto $V_c$, entonces los v\'ertices de $D_j^c$ adyacente a $C_i^c$ est\'an en $H$.
+\end{enumerate}
+    El subgrafo $G'[H]$ existe para cualquier $3$-partici\'on de $G$, y cuando la $3$-partici\'on corresponde con una 
+    coloraci\'on se puede comprobar que todos los v\'ertices en $G'[H]$ tienen grado $3$, en principio en $G'$ todos los v\'ertices son de grado $3$ excepto los 
+    $x_{jp}^c$ y $y_{jp}^c$ de los $D_{jp}^c$ que son de grado $4$ pero en el subgrafo se hace una construcci\'on a partir de una coloraci\'on y en $G'$ los $D_{jp}^c$ grafos reemplazad aristas, 
+    entonces los v\'ertices $x_{jp}^c$ y $y_{jp}^c$ est\'an conctados a v\'ertices de c\'irculos que no pertenecer\'an ambos a $H$, de donde obligatoriamente quedan en grado $3$. De igual modo ocurre con los v\'ertices $u_i$ y $y_i$ de los $U_i$, quienes tienen 
+    grado $4$ cada uno en $G$, pero como $H$ lo formamos considerando la $3$-partici\'on y cada v\'ertice puede estar s\'olo en uno de los $3$ conjuntos, entonces de las aristas que inciden en $u_i$ solo se quedan las $2$ que lo conectan al ciclo $C'$ y la que se corresponde a si $v_i$ 
+    est\'a en el conjunto $V_1$ o no, y en los casos en los que se toma alg\'un $y_i$ como parte del conjunto $H$, en \'el solo permanecen las dos aristas que lo conectan al resto del $U_i$ y solo una de las que indica si el v\'ertice est\'a en el conjunto $V_2$ o en el $V_3$ de la $3$-partici\'on. 
+    Por tanto en $G'[H]$, todos los v\'ertices tienen grado $3$.\\ 
+
+($\Leftarrow$) Si $G'$ contiene un subgrafo $3$-regular $G'[H]$, entonces sobre $H$ se cumplen las siguientes propiedades:\\ 
+
+\begin{enumerate}
+    \item Todos los v\'ertices $a_{pi}$ y $u_i$ pertenecen a $H$.
+    \item Por cada $i$, $1~ \leq~i~\leq ~n$, exactamente uno de los ciclos $C_i^{h}$ est\'a en $H$.
+    \item Por cada $i$, $1~ \leq~i~\leq ~n$, si $C_i^{h}$ est\'a en $H$, entonces ning\'un otro $C_j^{h}$ para toda $j$ tal que $<i,j> \in E(G)$.
+\end{enumerate}
+
+Por la proposici\'on (2) implica que el subgrafo $G'[H]$ es una $3$-partici\'on de los v\'ertices de $G'$ tal que el v\'ertice
+$v_i$ est\'a en la partici\'on $c$ si $C_i^c \in H$. La proposici\'on (3) asegura que v\'ertices adyacentes est\'en en diferentes conjuntos en la partici\'on, de donde
+si $G'$ tiene $G'[H]$ como subgrafo c\'ubico, entonces $G$ es $3$-coloreable. \\ 
+
+\subsection*{Reducci\'on implementada}
+\subsection*{Soluci\'on Backtrack}
+
+
+\end{document}
