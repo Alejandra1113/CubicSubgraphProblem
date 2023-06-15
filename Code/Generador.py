@@ -1,7 +1,7 @@
 import random
 
 def ConnexGraphGenerator():
-    n = random.randint(4, 20)
+    n = random.randint(4, 100)
     adjacent_matrix = [[0]*n for _ in range(n)]
     m = random.randint(n-1, (n * (n-1))/2)
     edges = []
