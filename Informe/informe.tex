@@ -3,6 +3,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
 
 \begin{document}
 
@@ -96,11 +98,14 @@ color de $G$, entonces existe un grafo $G'[H]$, subgrafo inducido de $G'$ que es
 
 Por la proposici\'on (2) implica que el subgrafo $G'[H]$ es una $3$-partici\'on de los v\'ertices de $G'$ tal que el v\'ertice
 $v_i$ est\'a en la partici\'on $c$ si $C_i^c \in H$. La proposici\'on (3) asegura que v\'ertices adyacentes est\'en en diferentes conjuntos en la partici\'on, de donde
-si $G'$ tiene $G'[H]$ como subgrafo c\'ubico, entonces $G$ es $3$-coloreable. \\ 
+si $G'$ tiene $G'[H]$ como subgrafo c\'ubico, entonces $G$ es $3$-coloreable. $\Box$  \\ 
 
 \subsection*{Reducci\'on implementada}
 Para poder comparar resultados en la pr\'actica 
 \subsection*{Soluci\'on Backtrack}
+La soluci\'on exacta al problema del subgrafo $3$-regular fue programada haciendo uso de un algoritmo de Backtrack en el que para cada una de las aristas del grafo se tienen 
+dos posibles opciones, esta forma parte del subgrafo $3$-regular o no, por tanto se genera un \'arbol binario en el que cada rama corresponde a la selecci\'on o no de una arista
+para ser parte del subgrafo. 
 
 \subsection*{Cuestiones sobre subgrafos 3-regulares}
 \textbf{Teorema}: Para todo $p$ primo, cualquier grafo $G=(V,E)$ tal que el promedio de los grados de sus v\'ertices sea mayor que 
@@ -109,7 +114,7 @@ $2p-2$ y el $\Delta(G)$ sea a lo sumo $2p -1$, tiene un subgrafo $p$-regular.\\
 \textbf{Demostraci\'on}: Sean los valores binarios $a_{i,j}$, tales que $a_{i,j} = 1$ si la arista $e_{j}$ incide en el v\'ertice $v_i$, $a_{i,j} = 0$ en otro caso.
 Considerando el polinomio de variables $x_e,~ e\in E(G)$:
 
-$$P(x_e) = \prod_{v \in V(G)} \left( 1 - \left(\sum_{e \in E(G)} a_{ve} x_e\right)\right)^(p-1)- \prod_{e \in E(G)} (1 - x_e)$$ 
+$$P(x_e) = \prod_{v \in V(G)} \left( 1 - \left(\sum_{e \in E(G)} a_{ve} x_e\right)^{(p-1)}\right) - \prod_{e \in E(G)} (1 - x_e)$$ 
 
 Como se tiene que el grado promedio es mayor que $2p-2$, entonces: 
 
@@ -117,5 +122,13 @@ $$\frac{2|E|}{|V|} > 2p-2 $$
 $$|E| > (p-1)|V|$$
 
 Por tanto, se tiene que el grado de $P$ es $|E| = \sum_{e \in E} t_e$, donde $t_e = 1$ para $e \in E$, luego se tiene que el 
-coeficiente principal del polinomio es $- \prod_{e \in E}  - x_e^{t_e} = - \prod_{e \in E} - x_e = (-1)^{|E| + 1} \neq 0$.  
+coeficiente principal del polinomio es $- \prod_{e \in E}  - x_e^{t_e} = - \prod_{e \in E} - x_e = (-1)^{|E| + 1} \neq 0$. Sean los 
+conjuntos de soluci\'on $S_e = {0,1}$ para toda $e \in E$, como $|S_e| > t_e$ para toda $e \in E$, entonces por el Corolario del \textit{Teorema Combinatoria Nullstellensatz}, se tiene 
+que existe $s_e \in S_e$, tales que $P((s_1,...s_m))  \neq 0$. Dicho vector no es el vector $0$, ya que $P(0) = \prod_{v \in V(G)}  1 - \prod_{e \in E(G)} 1 = 1 - 1 = 0$. De aqui se tiene que entonces 
+como ag\'un $s_e$ debe ser igual a $1$, entonces $\prod_{e \in E(G)} (1 - s_e) = 0$, de donde para cada $v \in V$ se tiene que cumplir que 
+$\sum_{e \in E(G)} a_{ve} x_e \equiv 0$ (mod $p$), puesto que de lo contario por el \textit{Peque\~no Teorema de Fermat} se tiene que $(\sum_{e \in E(G)} a_{ve} s_e)^(p-1) \equiv 1$ (mod $p$), de donde 
+$P((s_1,...,s_m)) = 0 $. Por tanto en el subgrafo conformado por las aristas $e$ tales que $s_e = 1$, se tiene que todos los v\'ertices extremos de estas aristas tendr\'ian grado $p$, puesto a que para ellos
+$(\sum_{e \in E(G)} a_{ve} s_e) > 0$, divisible entre $p$ y menor que $2p-1$. $\Box $
+
+
 \end{document}
