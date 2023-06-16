@@ -5,6 +5,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{wrapfig}
 
 \begin{document}
 
@@ -47,11 +48,22 @@ Definamos t\'erminos a utilizar en la demostraci\'on:
 
 A partir del grafo $G$ se contruye un nuevo grafo $G'$ de la siguiente forma:\\ 
 
+\begin{wrapfigure}{R}{5cm}
+    \centering
+    \includegraphics[width= 0.2\textwidth]{img1.png}
+\end{wrapfigure}
+
 1 - Por cada $v_i$ de $V(G)$ se crean $3$ ciclos $C_i^1$, $C_i^2$ y $C_i^3$, cada uno de longitud igual a $2 ~*~ d(v_i)~ + ~1$. Denotemos 
 los v\'ertces de cada ciclo $C_i^h$ como $c_{ij}^h$, $1~ \leq~i~\leq ~n$, $1~ \leq~d~\leq ~2 ~*~ d(v_i)~ + ~1$, $1~ \leq~h~\leq ~3$.\\ 
 
+
 2 - Por cada $e_j$ de $E(G)$ se crean $3$ subgrafos $D_{j}^1$, $D_{j}^2$ y $D_{j}^3$ en $G'$, donde cada $D_{j}^h$, $1~ \leq~h~\leq ~3$,  es un $K^{'}_4$, a los dos v\'ertices 
 de $D_{j}^h$ con grado $2$ los denotaremos como $x_{j}^h$ y $y_{j}^h$.\\
+\begin{wrapfigure}{L}{5cm}
+    \centering
+    \includegraphics[width= 0.2\textwidth ]{img2.png}
+\end{wrapfigure}
+
 
 3 - Por cada $e_j$, sean $v_s$ y $v_t$ los v\'ertices sobre los que incide en $G$, de los ciclos $C_s^h$ ($C_t^h$) se toman $2$ v\'ertices 
 $c_{s\alpha}^h$ y $c_{s\beta}^h$ ($c_{s\alpha}^h$ y $c_{s\beta}^h$) que aun tengan degree $2$; por cada $1~\leq ~h ~\leq~ 3$ se agragan a $G'$ las aristas: $<c_{s\alpha}^h, x_{j}^h>$, $<c_{s\beta}^h, y_{j}^h>$, 
@@ -59,17 +71,37 @@ $<c_{t\alpha}^h, x_{j}^h>$ y $<c_{t\beta}^h, y_{j}^h>$.\\
 
 Una vez consideradas todas las aristas en el paso (3), se tiene que para cada ciclo $C_i^h$ ( $1~\leq ~i ~\leq~ n$, $1~\leq ~h ~\leq~ 3$ )
 solo queda un v\'ertice con degree $2$. Nombremos dichos v\'ertices como $w_i^h$.\\ 
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width= 0.5\textwidth ]{img3.png}
+\end{figure}
 
 4 - Por cada $1~\leq ~i ~\leq~ n$, se construye un subgrafo $U_i$, que es un $K^{'}_4$ m\'as un v\'ertice al que denominaremos $u_{i}$, los v\'ertices de grado $2$ del $K^{'}_4$
 los denominaremos $x_{i}$ y $y_{i}$, el v\'ertice $u_i$ se une a los restantes del  $K^{'}_4$ mediante una arista $<x_{i},u_i>$.\\ 
 
+
+
 Se toman todos los grafos $U_i$ y se agregan a $G'$, junto con las aristas: $<u_i, w_i^1>$, $<y_i, w_i^2>$ y $<y_i, w_i^3>$. \\
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width= 0.4\textwidth ]{img4.png}
+    \includegraphics[width= 0.3\textwidth ]{img5.png}
+\end{figure}
 
 5 - Agregar el ciclo $C'$ de longitud $2~*~n$ a $G'$, conformado por los v\'ertices: $\{ a_{11}, ... , a_{1n}, a_{21}, ... , a_{2n} \}$ y agregar las aristas 
 $<a_{pi}, u_{i}>$ para $p = 1,2$.\\
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width= 0.3\textwidth ]{img6.png}
+\end{figure}
 
 Construido $G'$, queda demostrar que en $G$ es $3$-coloreable si y solo si $G'$ tiene un subgrafo c\'ubico. \\ 
 
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width= 0.7\textwidth ]{img7.png}
+\end{figure}
 ($\Rightarrow$) Sea $G$ un grafo $3$-coloreable, y una $3$-partici\'on de $V(G)$ tal que en cada conjunto $V_i$ queden solo v\'ertices de una mismo 
 color de $G$, entonces existe un grafo $G'[H]$, subgrafo inducido de $G'$ que es $3$-regular, ya que siempre podemos tomar los v\'ertices de la siguiente forma:\\
 
@@ -134,25 +166,25 @@ de backtrack para subgrafo $3$-regular tambien ha de devolver \textit{True} para
 La funci\'on \textit{Reduction} realiza las siguientes operaci\'ones: 
 
 \begin{itemize}
-    \item Crea e inicializa la matriz de adyacencia de G: $n^2 + m$
-    \item Determina los degrees de cada v\'ertice: $n^2$
-    \item Realiza el paso (1) de la reducci\'on: $n * 3(2n-1)$
-    \item Crea las $K'_4$ del paso (2): $m$
-    \item Conecta las $K'_4$ creados al grafo: $m * 4(2n-1)$
-    \item Crea los $K'_4$ m\'as un v\'ertice del paso (3) y los conecta: $n(2n -1) $
-    \item Crea el ciclo $C'$ del paso (4) y lo conecta al grafo: $2n$
-    \item El grafo creado tiene un m\'aximo de $13 n + 4m$ v\'ertices
-    \item Crea la matriz de adyacencia para el nuevo grafo y las aristas: $2(13 n + 4m)^2$
+    \item[$\circlearrowright $] Crea e inicializa la matriz de adyacencia de G: $n^2 + m$
+    \item[$\circlearrowright $] Determina los degrees de cada v\'ertice: $n^2$
+    \item[$\circlearrowright $] Realiza el paso (1) de la reducci\'on: $n * 3(2n-1)$
+    \item[$\circlearrowright $] Crea las $K'_4$ del paso (2): $m$
+    \item[$\circlearrowright $] Conecta las $K'_4$ creados al grafo: $m * 4(2n-1)$
+    \item[$\circlearrowright $] Crea los $K'_4$ m\'as un v\'ertice del paso (3) y los conecta: $n(2n -1) $
+    \item[$\circlearrowright $] Crea el ciclo $C'$ del paso (4) y lo conecta al grafo: $2n$
+    \item[$\circlearrowright $] El grafo creado tiene un m\'aximo de $6n^2 + 4n + 12m$ v\'ertices
+    \item[$\circlearrowright $] Crea la matriz de adyacencia para el nuevo grafo y las aristas: $2(6n^2 + 4n + 12m)^2$
 \end{itemize}
 
 Por lo que el costo de la reducci\'on cumple:
 
-$$T(n,m) \leq 2n^2 + 2m + 4n(2n-1) + 4m(2n-1) + 2n + 2(13 n + 4m)^2$$
-$$\leq 2n^2 + 2m + 4(2n-1)(n+m) + 2n + 2*169n^2 + 16*13mn + 32m^2$$
+$$T(n,m) \leq 2n^2 + 2m + 4n(2n-1) + 4m(2n-1) + 2n + 2(6n^2 + 4n + 12m)^2$$
+$$\leq 2n^2 + 2m + 4(2n-1)(n+m) + 2n + 2(6n^2 + 4n + 12m)^2$$
 
 Como $m \leq \frac{n(n-1)}{2} \leq n^2$ entonces
 
-$$T(n,m) \leq 4n^2 + 4(2n-1)(n+n^2) + 2n + 2*169n^2 + 16*13n^3 + 32n^4 \leq Kn^4$$ 
+$$T(n,m) \leq 4n^2 + 4(2n-1)(n+n^2) + 2n + 2(18n^2 + 4n)^2 \leq Kn^4$$ 
 
 donde $K$ es una constante lo suficientemente grande, de donde $T(n,m) = O(n^4)$, por lo 
 que se pude computar la reducci\'on en tiempo polinomial.
@@ -253,15 +285,15 @@ Sea $G$ un grafo del que se quiere determinar si es $3$-coloreable, tal que $|V(
 reducci\'on inicial, para obtener la entrada al problema de subgrafo c\'ubico, entonces sobre $G'$ sabemos lo siguiente: 
 
 \begin{itemize}
-    \item $G'$ tinene un subgrafo c\'ubico $\Leftrightarrow $ $G$ es $3$-coloreable.
-    \item Si en $G'$ hay un subgrafo c\'ubico $G'[H]$ entonces: 
+    \item[$\triangle $] $G'$ tinene un subgrafo c\'ubico $\Leftrightarrow $ $G$ es $3$-coloreable.
+    \item[$\triangle $] Si en $G'$ hay un subgrafo c\'ubico $G'[H]$ entonces: 
     \begin{itemize}
-        \item $C'$ est\'a en $H$, lo que aporta $2|V(G)|$ v\'ertices.
-        \item Por cada $v$ de $G$ hay un $C_i^h$ en $H$, lo que aporta $\sum_{v \in V(G)} 2*d(v) + 1 \geq 3|V(G)|$ v\'ertices.
-        \item Todos los $u_i$ est\'an en $H$, aportando $|V(G)|$ v\'ertices.
-        \item Por cada arista de $G$, en $H$ est\'an los $4$ v\'ertices de un $D_j^h$, como $G$ conexo entonces $4|E(G)| \geq 4(|V(G)| - 1) = 4|V(G)|-4$.
-        \item Como $|V(G)| > \left\lceil \frac{2 \rho}{5} \right\rceil \geq 1 $, entonces en $H$ alguno de los $C_i^h$ tiene $h =2,3$, por lo que en $H$ est\'an al menos los $4$ v\'ertices de alg\'un $D_i$.
-        \item $\therefore~ |H| \geq 2|V(G)| + 3|V(G)| + |V(G)| + 4|V(G)|-4 +4 = 10|V(G)|$
+        \item[$\blacktriangle $] $C'$ est\'a en $H$, lo que aporta $2|V(G)|$ v\'ertices.
+        \item[$\blacktriangle $] Por cada $v$ de $G$ hay un $C_i^h$ en $H$, lo que aporta $\sum_{v \in V(G)} 2*d(v) + 1 \geq 3|V(G)|$ v\'ertices.
+        \item[$\blacktriangle $] Todos los $u_i$ est\'an en $H$, aportando $|V(G)|$ v\'ertices.
+        \item[$\blacktriangle $] Por cada arista de $G$, en $H$ est\'an los $4$ v\'ertices de un $D_j^h$, como $G$ conexo entonces $4|E(G)| \geq 4(|V(G)| - 1) = 4|V(G)|-4$.
+        \item[$\blacktriangle $] Como $|V(G)| > \left\lceil \frac{2 \rho}{5} \right\rceil \geq 1 $, entonces en $H$ alguno de los $C_i^h$ tiene $h =2,3$, por lo que en $H$ est\'an al menos los $4$ v\'ertices de alg\'un $D_i$.
+        \item[$\blacktriangle $] $\therefore~ |H| \geq 2|V(G)| + 3|V(G)| + |V(G)| + 4|V(G)|-4 +4 = 10|V(G)|$
     \end{itemize}
 \end{itemize}
 Si a $G'$ le agregamos un $K_4$ m\'as un v\'ertice($x$), conectando este v\'ertice a uno de los v\'ertices de $C'$, de este modo obtenemos un $C''$ que siempre tiene alg\'un subgrafo c\'ubico y que por tanto 
