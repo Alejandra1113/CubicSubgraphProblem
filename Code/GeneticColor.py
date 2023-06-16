@@ -1,7 +1,6 @@
 import random
 import numpy as np
 import matplotlib.pyplot as plt
-import Generador
 
 def create_individual(n, number_of_colors):
     individual = []
@@ -60,10 +59,11 @@ def genetic_coloro(graph):
     Gen = np.array([])
     Fit = np.array([])
 
-    number_of_colors = n = graph.shape[0]
+    n = graph.shape[0]
+    number_of_colors = 3
     '''GA'''
     condition = True    
-    while condition and number_of_colors + 1 > 3:
+    while condition:
         '''Create Population'''
         population_size = 200
         generation = 0
@@ -75,7 +75,7 @@ def genetic_coloro(graph):
         best_fitness = fitness(graph, population[0], n)
         fittest_individual = population[0]
         gen = 0
-        while(best_fitness != 0 and gen != 10000):
+        while(best_fitness != 0 and gen != 3000):
             gen += 1
             population = tournament_selection(population, graph, population_size)
             new_population = []
@@ -96,7 +96,7 @@ def genetic_coloro(graph):
                 if(fitness(graph, individual, n) < best_fitness):
                     best_fitness = fitness(graph, individual, n)
                     fittest_individual = individual
-            if gen % 100 == 0:
+            if gen % 500 == 0:
                 print("Generation: ", gen, "Best_Fitness: ",
                     best_fitness, "Individual: ", fittest_individual)
             Gen = np.append(Gen, gen)
@@ -107,18 +107,8 @@ def genetic_coloro(graph):
             best_fitness, "Individual: ", fittest_individual)
         print("\n\n")
         if(best_fitness != 0):
-            condition = False
-            print("Graph is ", number_of_colors+1, " colorable")
-            return number_of_colors + 1
+            return False
         else:
-            #Gen = np.append(Gen, gen)
-            #Fit = np.append(Fit, best_fitness)
-            #plt.plot(Gen, Fit)
-            #plt.xlabel("generation")
-            #plt.ylabel("best-fitness")
-            #plt.show()
-            #Gen = []
-            #Fit = []
-            number_of_colors -= 1
-    print("Graph is ", number_of_colors+1, " colorable")
-    return number_of_colors + 1
+            return True
+    return False
+
