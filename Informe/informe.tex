@@ -3,6 +3,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
 
 \begin{document}
 
@@ -72,8 +74,8 @@ Construido $G'$, queda demostrar que en $G$ es $3$-coloreable si y solo si $G'$ 
 color de $G$, entonces existe un grafo $G'[H]$, subgrafo inducido de $G'$ que es $3$-regular, ya que siempre podemos tomar los v\'ertices de la siguiente forma:\\
 
 \begin{enumerate}
-    \item Todos los v\'ertices $a_{ij}$ est\'an en $V(H)$
-    \item Todos los v\'ertices $u_{i}$ est\'an en $V(H)$
+    \item Todos los v\'ertices $a_{ij}$ est\'an en $H$
+    \item Todos los v\'ertices $u_{i}$ est\'an en $H$
     \item Si $v_i$ de $G$ est\'a en el conjunto $V_c$ de la tricoloraci\'on, entonces los v\'ertices $c_{ij}$ del ciclo $C_i^c$ est\'an en $H$.
     \item Si $c ~\neq ~1$ para el conjunto $V_c$ al que pertenece $v_i$, entonces los v\'ertices de $U_i$ pertenecen a $H$.
     \item Si la arista $e_j$, es adyacente al v\'ertice $v_i$ que est\'a en el conjunto $V_c$, entonces los v\'ertices de $D_j^c$ adyacente a $C_i^c$ est\'an en $H$.
@@ -94,22 +96,89 @@ color de $G$, entonces existe un grafo $G'[H]$, subgrafo inducido de $G'$ que es
     \item Por cada $i$, $1~ \leq~i~\leq ~n$, si $C_i^{h}$ est\'a en $H$, entonces ning\'un otro $C_j^{h}$ para toda $j$ tal que $<i,j> \in E(G)$.
 \end{enumerate}
 
+
+
 Por la proposici\'on (2) implica que el subgrafo $G'[H]$ es una $3$-partici\'on de los v\'ertices de $G'$ tal que el v\'ertice
 $v_i$ est\'a en la partici\'on $c$ si $C_i^c \in H$. La proposici\'on (3) asegura que v\'ertices adyacentes est\'en en diferentes conjuntos en la partici\'on, de donde
-si $G'$ tiene $G'[H]$ como subgrafo c\'ubico, entonces $G$ es $3$-coloreable. \\ 
+si $G'$ tiene $G'[H]$ como subgrafo c\'ubico, entonces $G$ es $3$-coloreable. $\Box$  \\ 
 
 \subsection*{Reducci\'on implementada}
-Para poder comparar resultados en la pr\'actica 
-\subsection*{Soluci\'on Backtrack}
+Con el objetivo de probar en la pr\'actica la reducci\'on del problema $3$-coloreable al problema del subgrafo c\'ubico, se program\'o la trasformaci\'on de 
+la entrada de un problema al otro en la funci\'on \texttt{Reduction} del archivo \texttt{Reduction.py}. Adem\'as se programaron las soluciones backtrack para ambos problemas,
+de modo que se pueda comprobar que cuando el algoritmo backtrack para determinar si un grafo es $3$-coloreable devuelva \textit{True} para alguna entrada, entonces el algoritmo 
+de backtrack para subgrafo $3$-regular tambien ha de devolver \textit{True} para el grafo obtenido de la reducc\'ion, an\'alogamente para los casos en que el resultado sea \textit{False}.\\ 
+
+La funci\'on \textit{Reduction} realiza las siguientes operaci\'ones: 
+
+\begin{itemize}
+    \item Crea e inicializa la matriz de adyacencia de G: $n^2 + m$
+    \item Determina los degrees de cada v\'ertice: $n^2$
+    \item Realiza el paso (1) de la reducci\'on: $n * 3(2n-1)$
+    \item Crea las $K'_4$ del paso (2): $m$
+    \item Conecta las $K'_4$ creados al grafo: $m * 4(2n-1)$
+    \item Crea los $K'_4$ m\'as un v\'ertice del paso (3) y los conecta: $n(2n -1) $
+    \item Crea el ciclo $C'$ del paso (4) y lo conecta al grafo: $2n$
+    \item El grafo creado tiene un m\'aximo de $13 n + 4m$ v\'ertices
+    \item Crea la matriz de adyacencia para el nuevo grafo y las aristas: $2(13 n + 4m)^2$
+\end{itemize}
+
+Por lo que el costo de la reducci\'on cumple:
+
+$$T(n,m) \leq 2n^2 + 2m + 4n(2n-1) + 4m(2n-1) + 2n + 2(13 n + 4m)^2$$
+$$\leq 2n^2 + 2m + 4(2n-1)(n+m) + 2n + 2*169n^2 + 16*13mn + 32m^2$$
+
+Como $m \leq \frac{n(n-1)}{2} \leq n^2$ entonces
+
+$$T(n,m) \leq 4n^2 + 4(2n-1)(n+n^2) + 2n + 2*169n^2 + 16*13n^3 + 32n^4 \leq Kn^4$$ 
+
+donde $K$ es una constante lo suficientemente grande, de donde $T(n,m) = O(n^4)$, por lo 
+que se pude computar la reducci\'on en tiempo polinomial.
+
+\subsection*{Soluci\'on Backtrack para el problema del subgrafo c\'ubico}
+La soluci\'on exacta al problema del subgrafo $3$-regular fue programada haciendo uso de un algoritmo de Backtrack en el que para cada una de las aristas del grafo se tienen 
+dos posibles opciones, esta forma parte del subgrafo $3$-regular o no, por tanto se genera un \'arbol binario en el que cada rama corresponde a la eliminaci\'on o no de una arista
+del grafo, para ser parte del subgrafo. Luego de que se haya pasado por todas las aristas decidiendo si ponerlas o no, en el caso base se comprueba que el grado de todos los v\'ertices sea $3$ o $0$
+y que adem\'as no todos sean $0$. Esta primera variante (top-down) genera todos los posibles subgrafos de $G$, por lo que tiene $2^m$ posibles subgrafos finales a analizar, el c\'odigo de la misma se encuentra
+en la funci\'on \texttt{BacktrackCubicSubgraph} del archivo \texttt{BacktrackCubicSubgraph.py}.\\ 
+
+Para mejorar el costo del Backtrack, fue implementada una soluci\'on bottom-up, en la que inicialmente se asume el grafo $G$ sin aristas y 
+se va decidiendo por cada arista la opci\'on de agregarla o no al grafo, comprobando que se pueda agregar antes de hacerlo, en caso contrario se poda esa rama 
+del \'arbol de recursividad. De igual modo en el caso base comprueba que no todos los v\'ertices hayan quedado con grado $0$ y que todos tengan grado $0$ o $3$. 
+Esta implementaci\'on se encuentra en el m\'etodo \texttt{BacktrackCubicSubgraph}, tanbi\'en en el archivo \texttt{BacktrackCubicSubgraph.py}.
+
+\subsection*{Soluci\'on Backtrack para el problema del grafo 3-coloreable}
+
+Para determinar si un grafo es $3$-coloreable tambi\'en se programaron dos algoritmos de backtrack, el primero computa todas las posibles 
+combinaciones de colores que se le pueden dar a los $n$ v\'ertices del grafo y una vez que tiene una nueva combinaci\'on se eval\'ua que para cada 
+``color'' se tenga que los v\'ertices que est\'an en ese conjunto formen un conjunto independiente, en caso afirmativo el grafo es $3$-coloreable, y si no se procesde a formar 
+otra posible combinaci\'on. La cantidad de combinaciones posibles equivale a la forma de repartir $n$ objetos iguales en $3$ categor\'ias diferentes, es decir $n^3$ posibles caos.\\ 
+
+Para podar el backtrack se implement\'o otro algoritmo que antes de asignarle un color a un v\'ertice comprueba que no tenga vecinos en dicho grupo. De este modo se pueden 
+eliminar asignaciones que sabemos no van a ser efectivas. Estos algoritmos se encuentran programados en las funciones \texttt{ThreeColorableBacktrack} y \texttt{ThreeColorableB} respectivamente, ambos en el archivo 
+\texttt{Backtrack3Coloreable.py}.
+
+\subsection*{Generador de casos pruebas}
+
+Para generar casos de prueba generamos grafos con un total de v\'ertices aleatorio $n \in [4;100], n \in \mathbb{N}$ (la cota m\'inima fue $4$ producto que para menos que eso es trivial que el grafo es $3$-coloreable) 
+de igual modo se seleccion\'o una cantidad $m$ aleatoria de aristas con $m \in [n-1; \frac{n(n-1)}{2}]$, las cuales se agregaron entre v\'ertices aleatorios. Se busc\'o que el grafo fuera conexo haciendo un recorrido BFS, si un nodo no fue alcanzado 
+se conect\'o con alguno de los v\'ertices de esa componenete aleatoreamente. Se repite este proceso hasta que todos est\'an conectados. La decisi\'on de conectar el grafo se debe a que, el subgrafo $3$-regular tienen respuesta afirmativa 
+si y solo si para alguna componente conexa existe el subgrafo, mientras que grafo $3$-coloreable tiene respuesta afirmativa si y solo si todas sus componentes conexas se pueden pintar con $3$ colores.\\ 
+
+
+
+
+
+
 
 \subsection*{Cuestiones sobre subgrafos 3-regulares}
+
 \textbf{Teorema}: Para todo $p$ primo, cualquier grafo $G=(V,E)$ tal que el promedio de los grados de sus v\'ertices sea mayor que 
 $2p-2$ y el $\Delta(G)$ sea a lo sumo $2p -1$, tiene un subgrafo $p$-regular.\\ 
 
 \textbf{Demostraci\'on}: Sean los valores binarios $a_{i,j}$, tales que $a_{i,j} = 1$ si la arista $e_{j}$ incide en el v\'ertice $v_i$, $a_{i,j} = 0$ en otro caso.
 Considerando el polinomio de variables $x_e,~ e\in E(G)$:
 
-$$P(x_e) = \prod_{v \in V(G)} \left( 1 - \left(\sum_{e \in E(G)} a_{ve} x_e\right)\right)^(p-1)- \prod_{e \in E(G)} (1 - x_e)$$ 
+$$P(x_e) = \prod_{v \in V(G)} \left( 1 - \left(\sum_{e \in E(G)} a_{ve} x_e\right)^{(p-1)}\right) - \prod_{e \in E(G)} (1 - x_e)$$ 
 
 Como se tiene que el grado promedio es mayor que $2p-2$, entonces: 
 
@@ -117,5 +186,87 @@ $$\frac{2|E|}{|V|} > 2p-2 $$
 $$|E| > (p-1)|V|$$
 
 Por tanto, se tiene que el grado de $P$ es $|E| = \sum_{e \in E} t_e$, donde $t_e = 1$ para $e \in E$, luego se tiene que el 
-coeficiente principal del polinomio es $- \prod_{e \in E}  - x_e^{t_e} = - \prod_{e \in E} - x_e = (-1)^{|E| + 1} \neq 0$.  
+coeficiente principal del polinomio es $- \prod_{e \in E}  - x_e^{t_e} = - \prod_{e \in E} - x_e = (-1)^{|E| + 1} \neq 0$. Sean los 
+conjuntos de soluci\'on $S_e = {0,1}$ para toda $e \in E$, como $|S_e| > t_e$ para toda $e \in E$, entonces por el Corolario del \textit{Teorema Combinatoria Nullstellensatz}, se tiene 
+que existe $s_e \in S_e$, tales que $P((s_1,...s_m))  \neq 0$. Dicho vector no es el vector $0$, ya que $P(0) = \prod_{v \in V(G)}  1 - \prod_{e \in E(G)} 1 = 1 - 1 = 0$. De aqui se tiene que entonces 
+como ag\'un $s_e$ debe ser igual a $1$, entonces $\prod_{e \in E(G)} (1 - s_e) = 0$, de donde para cada $v \in V$ se tiene que cumplir que 
+$\sum_{e \in E(G)} a_{ve} x_e \equiv 0$ (mod $p$), puesto que de lo contario por el \textit{Peque\~no Teorema de Fermat} se tiene que $(\sum_{e \in E(G)} a_{ve} s_e)^(p-1) \equiv 1$ (mod $p$), de donde 
+$P((s_1,...,s_m)) = 0 $. Por tanto en el subgrafo conformado por las aristas $e$ tales que $s_e = 1$, se tiene que todos los v\'ertices extremos de estas aristas tendr\'ian grado $p$, puesto a que para ellos
+$(\sum_{e \in E(G)} a_{ve} s_e) > 0$, divisible entre $p$ y menor que $2p-1$. $\Box $
+
+
+\subsection*{Algoritmo gen\'etico para determinar la existencia de subgrafo c\'ubico}
+
+\subsection*{Algoritmo gen\'etico para determinar si el grafo es 3-coloreable}
+
+\subsection*{Complicando el problema, como si ya no estuviera complicado}
+Aunque el problema de determinar si un grafo tiene un subgrafo c\'ubico es un problema puramente de decisi\'on, 
+si se modifica un poco la orientaci\'on del problema se puede buscar escribir problemas que sean de optimizaci\'on 
+aunque ello implique que se pierda la reigurosidad de que el grafo tena realmente un subgrafo $3$-regular o que 
+sea necesario agreagar nuevas restricciones.\\
+
+
+Una primera idea es la de maximizar la cantidad de v\'ertices del grafo que quedan con degree $0$ o $3$ luego de haber 
+removido un conjunto de aristas del grafo, sin quitarlas todas, pero este problema tiene una soluci\'on aproximada mediante un greedy 
+que es bastante buena, puesto que si la \'unica restricci\'on es no quitar todas las aristas, basta con dejar solo una 
+y tendr\'iamos todos los restantes v\'ertices con degree $0$ excepto por los $2$ que qedar\'ian con degree $1$. N\'otese que el 
+\'optimo de este problema en el mejor de los casos es $n$, que se alcanzar\'ia en el caso que el grafo tenga un subgrafo c\'ubico, mientras 
+que con el greedy se tiene que el \'optimo es $n-2$ v\'ertices con degree $0$ o  $3$, por lo que la soluci\'on golosa solo se aleja en el peor caso 
+en $2$ de la \'optima, siendo una buena aproximaci\'on.\\ 
+
+Otra idea, restringiendo m\'as el problema es, no solo forzar a que tengamos al menos $1$ arista que no quitemos del grafo, sino 
+a que al menos nos quede un v\'ertice de grado $3$, esto implica que en el grafo de entrada al menos tiene que existir un v\'ertice con grado 
+mayor o igual a $3$. Por tanto tambi\'en se puede de forma greedy encontrar un valor cercano al \'optimo, si tomamos uno de los v\'ertices de grado mayor  
+o igual que $3$ en el grafo y nos quedamos con $3$ de sus aristas, con lo que cumplimos la restricci\'on de tener al menos un v\'ertice de grado $3$ y en total 
+quedar\'ian $n-3$ v\'ertices que cumplen la condici\'on de tener grado $3$ o $0$, lo cual dista en el peor caso en $3$ al rasultado \'optimo que puede llegar a ser $n$
+si tuvi\'eramos en el grafo un subgrafo $3$-regular.\\ 
+
+Una tercera idea, esta s\'i enfocada en la detecci\'on de subgrafos $3$-regulares, es dado un grafo del que sabemos tiene al menos un subgrafo $3$-regular, determinar la cardinalidad del 
+mayor subgrafo $3$-regular que tiene. Si para esta idea existiera un algoritmo polinomial que fuera un $\rho$-aproximaci\'on del \'optimo del porblema, es decir que nos devolviese un valor $M'$
+que $M'\rho \geq M$, es decir fuera, en el peor caso, $\rho$ veces menor que el resultado real del tama\~no m\'aximo del subgrafo $3$-regular, entonces ocurrir\'ia lo siguiente: \\ 
+
+
+Sea $G$ un grafo del que se quiere determinar si es $3$-coloreable, tal que $|V(G)| >  \left\lceil\frac{2\rho}{5} \right\rceil $ y $G$ es conexo, si a partir de $G$, contruimos un $G'$ utilizando la 
+reducci\'on inicial, para obtener la entrada al problema de subgrafo c\'ubico, entonces sobre $G'$ sabemos lo siguiente: 
+
+\begin{itemize}
+    \item $G'$ tinene un subgrafo c\'ubico $\Leftrightarrow $ $G$ es $3$-coloreable.
+    \item Si en $G'$ hay un subgrafo c\'ubico $G'[H]$ entonces: 
+    \begin{itemize}
+        \item $C'$ est\'a en $H$, lo que aporta $2|V(G)|$ v\'ertices.
+        \item Por cada $v$ de $G$ hay un $C_i^h$ en $H$, lo que aporta $\sum_{v \in V(G)} 2*d(v) + 1 \geq 3|V(G)|$ v\'ertices.
+        \item Todos los $u_i$ est\'an en $H$, aportando $|V(G)|$ v\'ertices.
+        \item Por cada arista de $G$, en $H$ est\'an los $4$ v\'ertices de un $D_j^h$, como $G$ conexo entonces $4|E(G)| \geq 4(|V(G)| - 1) = 4|V(G)|-4$.
+        \item Como $|V(G)| > \left\lceil \frac{2 \rho}{5} \right\rceil \geq 1 $, entonces en $H$ alguno de los $C_i^h$ tiene $h =2,3$, por lo que en $H$ est\'an al menos los $4$ v\'ertices de alg\'un $D_i$.
+        \item $\therefore~ |H| \geq 2|V(G)| + 3|V(G)| + |V(G)| + 4|V(G)|-4 +4 = 10|V(G)|$
+    \end{itemize}
+\end{itemize}
+Si a $G'$ le agregamos un $K_4$ m\'as un v\'ertice($x$), conectando este v\'ertice a uno de los v\'ertices de $C'$, de este modo obtenemos un $C''$ que siempre tiene alg\'un subgrafo c\'ubico y que por tanto 
+servir\'ia de entrada para el algoritmo de $\rho$-aproximaci\'on. \\
+
+N\'otese que si $G$ no es $3$-coloreable, entonces el mayor subgrafo $3$-regular de $G''$ es el $K_4$ que agregamos puesto a que $G'$ no tiene 
+subgrafos $3$-regulares en este caso y al conectar el $K_4$ a $G'$ mediante el v\'ertice $x$ que tambi\'en agregamos, se garantiza que en el grafo $G''$ el $K_4$
+agragado no expanda el tama\~no de ning\'un posible subgrafo ni genere otro nuevo distinto de \'el.\\ 
+
+En cambio, si $G$ es $3$-coloreable el m\'aximo subgrafo c\'ubico de $G''$ tiene cardinalidad mayor o igual a $10|V(G)| + 4$, de donde si al utilizar el algoritmo de la $\rho$-aproximaci\'on 
+este nos devolviese algo mayor que $4$ tendr\'iamos la certeza de que $G$ es $3$-coloreable porque el \'unico modo en que el subgrafo c\'ubico m\'aximo de $G''$ tenga m\'as de $4$ v\'ertices es en este caso. Tambi\'en si 
+la respuesta del algoritmo fuese exactamente $4$ (No puede ser menor porque no hay grafo c\'ubico de menos de $4$ v\'ertices) podemos asegurar que $G$ no es $3$-coloreable, ya que la $\rho$-aproximaci\'on en el peor caso devuelve un m\'aximo que es $\rho$ veces 
+peor que el real, de donde se tendr\'ia 
+
+$$M'\rho \geq M \Rightarrow 4\rho \geq M$$
+
+Como $M \geq 10|V(G)| + 4$, entonces: 
+
+$$4\rho \geq 10|V(G)| + 4 > 10|V(G)| \Rightarrow \frac{4\rho}{10} \geq |V(G)| \Rightarrow \frac{2\rho}{5} \geq |V(G)|$$
+
+Pero como sabemos que $|V(G)| >  \left\lceil\frac{2\rho}{5} \right\rceil $, entonces jam\'as ser\'ia devuelto $4$ por el algoritmo en caso que hubiese un subgrafo $3$-regular mayor.\\ 
+
+Adem\'as para todo grafo $G_0$, con cantidad de v\'ertices $n$ existe un grafo $G$ con cantidad de v\'ertices $|V(G)| >  \left\lceil\frac{2\rho}{5} \right\rceil $, tal que $G_0$ es $3$-coloreable $\Leftrightarrow$ $G$ es $3$-coloreable. Esto se consigue de la 
+siguiente forma, sea $k = \left\lceil\frac{2\rho}{5} \right\rceil - n$, si $k < 0$ ya $G_0$ tiene la cantidad de v\'ertices necesarios, en caso contrario creamos un grafo $P_{k+1}$ y conectamos uno de sus extremos a cualquier v\'ertice de $G_0$, si $G_0$ no era $3$-coloreable 
+agregarle v\'ertices en ninguna circunstancia reduce el n\'umero de colores con los que se puede pintar un grafo. Mientras que, si $G_0$ fuese $3$-coloreable, como $P_{k+1}$ se puede colorear con $2$ colores, dada una tripartici\'on de $G_0$ que se corresponda con una coloraci\'on, basta con determinar en 
+c\'ual de los $3$ conjuntos est\'a el v\'ertice al que uniremos con el $P_{k+1}$ y luego colorear correctamente los v\'ertices del $P_{k+1}$ con los $2$ colores que no contienen a dicho v\'ertice.\\ 
+
+De modo que si para el problema planteado hubiera una $\rho$-aproximaci\'on, el problema de determinar cuando un grafo es $3$-coloreable se resolver\'ia en tiempo polinomial, por tanto dicho algoritmo de $\rho$-aproximaci\'on no 
+puede existir. $\Box $.
+
 \end{document}
