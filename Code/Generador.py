@@ -1,7 +1,7 @@
 import random
+import numpy as np
 
-def ConnexGraphGenerator():
-    n = random.randint(4, 100)
+def ConnexGraphGenerator(n):    
     adjacent_matrix = [[0]*n for _ in range(n)]
     m = random.randint(n-1, (n * (n-1))/2)
     edges = []
@@ -16,8 +16,8 @@ def ConnexGraphGenerator():
                 edges.append((u,v))
                 break
 
-    added_edges = BFS_CCheck(n, adjacent_matrix)
-    return n, edges + added_edges
+    added_edges, adjacent_matrix = BFS_CCheck(n, adjacent_matrix)
+    return edges + added_edges, np.array(adjacent_matrix)
 
 
 def BFS_CCheck(n,adjacent_matrix):
@@ -40,14 +40,12 @@ def BFS_CCheck(n,adjacent_matrix):
             v = random.choice(list(filter(lambda x: visited[x] ==1, range(n) )))
             queue.append(u)
             visited[u] = 1
+            adjacent_matrix[u][v] = adjacent_matrix[v][u] = 1
             edges_list.append((u,v))
             mp +=1
         except:
             break
 
-    return edges_list
+    return edges_list, adjacent_matrix
 
-    
 
-n, edges = ConnexGraphGenerator()
-print(n)
