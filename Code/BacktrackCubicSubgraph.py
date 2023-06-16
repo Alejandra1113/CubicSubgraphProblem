@@ -20,7 +20,7 @@ def BacktrackCubicSubgraph(edges, degrees, index):
     return BacktrackCubicSubgraph(edges, degrees, index +1)
 
 #Backtrack que poda en cuanto las aristas se pasan del degree
-def BacktrackCubicS(edges, degrees, index):
+def BacktrackCubicS(edges, degrees, index=0):
     if index == len(edges):
         return all([x == 0 or x == 3 for x in degrees]) and any([x>0 for x in degrees])
 
@@ -39,7 +39,7 @@ def BacktrackCubicS(edges, degrees, index):
 
 
 #K5
-print(BacktrackCubicS([(0,1),(0,2),(0,3),(0,4),(1,2),(1,3),(1,4),(2,3),(2,4),(3,4)], [0]*5, 0))
+#print(BacktrackCubicS([(0,1),(0,2),(0,3),(0,4),(1,2),(1,3),(1,4),(2,3),(2,4),(3,4)], [0]*5, 0))
 
 #Petersen
-print(BacktrackCubicS([(1,2),(2,3),(3,4),(4,5),(5,6),(6,7),(7,8),(8,9),(9,1),(1,0),(0,4),(0,7),(3,6),(5,9),(2,8)], [0]*10, 0))
+#print(BacktrackCubicS([(1,2),(2,3),(3,4),(4,5),(5,6),(6,7),(7,8),(8,9),(9,1),(1,0),(0,4),(0,7),(3,6),(5,9),(2,8)], [0]*10, 0))
