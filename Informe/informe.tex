@@ -220,13 +220,70 @@ $(\sum_{e \in E(G)} a_{ve} s_e) > 0$, divisible entre $p$ y menor que $2p-1$. $\
 
 \subsection*{Algoritmo gen\'etico para determinar la existencia de subgrafo c\'ubico}
 
+Una alternativa para dar con la existencia o no de un subgrafo cúbico es utilizar técnicas de Inteligencia Artificial. En esta sección propondremos un algoritmo genético para decidir si un grafo cualquiera tiene un subgrafo cúbico. Para recordar un poco un algoritmo genético suele contar con una población solución inicial; una función fitness para evaluar cada solución, la cual se quiere minimizar o maximizar; un función de selección de la población; una operación de cruce de soluciones; posibles funciones de mutaciones, y de nueva generación de soluciones. La propuesta fue la siguiente:
+
+\begin{itemize}
+	\item Función de generación individual: Genera aleatoriamente un subgrafo del grafo original.
+	\item Función de selección con torneo: En cada etapa, se hace una mezcla de la población y se agrupan en parejas, varias soluciones, las cuales se evalúan con la función de fitness y la ganadora pasa a formar parte de la selección
+	\item Función de cruce de punto fijo: Se hace una bipartición de los nodos del grafo original, y se crean 2 soluciones nuevas que llamaremos, hijo 1 e hijo 2, utilizando 2 soluciones previamente que llamaremos padre 1 y padre 2. El hijo 1 adquiere todas las aristas que tenga el padre 1 entre los nodos de uno de los conjuntos de la bipartición, y también adquiere todas las aristas de que tenga el padre 2 entre los nodos del otro conjunto de la bipartición. Análogamente el hijo 2 aquiere las aristas de esta manera pero del padre 2 primero, y luego del padre 1. Note que las aristas que existían entre los 2 conjuntos de los nodos, no son heredadas por ninguno de los hijos.
+	\item Funciones de mutación:
+	\begin{itemize}
+		\item Mutación 1: Agregar una arista válida al grafo. Arista válida se traduce a una arista que está en el grafo original
+		\item Mutación 2: Quitar una arista del grafo
+		\item Mutación 3: Agregar todas las aristas válidas de un vértice.
+		\item Mutación 4: Quitar todas las aristas de un vértice, es decir, aislar el vértice. 
+	\end{itemize}
+	\item Función de fitness:
+	\begin{itemize}
+		\item Fitness 1: Para cada uno de los vértices se calcula el grado de cada vértice, y se suman las mínimas de las distancias entre el grado de cada uno, y $0$ o $3$. Note que si un grado tiene grado $1$, al estar más cerca de $0$ sumaría al fitness total $1$. y del mismo modo sucede si el vértice tuviera grado $2$, este estaría más cerca de $3$ y aportaría $1$ al fitness. En cambio un nodo con grado $9$ está más cerca de $3$, y tiene una distancia de $6$, la cual influiría en el valor del fitness. Note que el fitness sería $0$, solo cuando los grados de los nodos son $0$ o $3$ (no necesariamente todos a la vez), sin embargo para nuestro problema no es válido que todos los nodos sean de grado, $0$, por lo tanto en dicho caso, se penaliza el fitness con la la mitad de la sumatoria de los grados de los vértices del grafo original.
+		\item Fitness 2: Se fija un valor $p$ que representará un grado pivote. Mientras más alejado de $p$ esté el grado de un vértice, más penalización recibirá el fitness. Sin embargo la penalización es más fuerte para los grados menores que $p$, ya que esta será:
+		$$(p-x)*3)$$
+		mientras que para los grados mayores o iguales que $p$, la penalización será menos brusca:
+		$$\frac{(x - p + 3)}{3}$$
+		Sin embargo, si el grado del vértice es $0$ o $3$, el vértice no afectará al fitness, a no ser que todos los nodos tengan grado $0$ en ese caso, recibirá una penalización igual a lo explicado en la función 1. Note que esta función es $0$ solo cuando el grafo armado tiene un subgrafo 3-regular.
+	\end{itemize}	
+\end{itemize}
+
+El algoritmo genético implementado, consiste en generar una población de 200 soluciones con la función de creación individual. Luego hacer una selección del $75\%$ de la población mediante la función de selección con torneo. Crear una cantidad igual de hijos a la población seleccionada, producto del cruce con punto fijo. Luego realizar mutaciones a algunos hijos. Y finalmente rellenar con soluciones aleatorias nuevas, hasta tener nuevamente una población de 200 soluciones. Este proceso se repite varias veces, hasta que una solución obtiene fitness $0$, o hasta que hayan sucedido cierto número de operaciones.
+
+Las experimentaciones que hicimos arrojaron mejores resultados al seleccionar la segunda función de fitness y solamente las mutaciones de eliminación y agregado de aristas. Lo primero tiene más sentido, ya que una solución cuyos grados de los nodos están más cercanos del $0$ o del $3$ no suele resolverse tan fácil quitando o poniendo pocas aristas, sino que por lo general esta solución estaría mucho más apartada de alguna solución real, haciendo cambios de este estilo. Por lo tanto la segunda función de fitness nos garantiza que se explore más por otras vías, y la búsqueda no quede tan sesgada.
+
+Ahora bien, algo más que se añadió a la función de fitness para reconocer si el grafo tenía un subgrafo cúbico, fue utilizar el Teorema explicado en la sección anterior. Note que al ser $3$ un número primo el teorema nos garantiza que un grafo contiene un subgrafo cúbico si el promedio de los grados de sus vértices es mayor estricto que 4, y el grado máximo es 5. Entonces si a la función de fitness le agregamos que cuando esta condición ocurra, dé como valor $0$, entonces nuestro algoritmo genético tendrá más opciones para hallar la solución.
+
+Para comprobar la efectividad de este algoritmo se hicieron varias pruebas sobre varios grafos que se sabían que tenían subgrafos cúbicos, y sobre otros que se desconocía. Los subgrafos que sí se conocía que tenían subgrafos cúbicos se generaron con el modulo networkx de Python, el cual permite generar aleatoriamente grafos 3-regulares. A estos grafos solamente tuvimos que añadirle aleatoriamente más vértices. Se generaron más de 30 grafos, por cada cantidad de nodos fijados. Como las computadoras en las que corrimos estos casos de pruebas no son muy modernas utilizamos valores entre 10 y 40 nodos. Por cada caso de prueba ejecutado se aplicó el algoritmo genético 3 veces, para también contabilizar cuántas veces se fallaban adicionalmente, y como seguridad, por si la población inicial creada era muy mala. A continuación mostramos alguno de los gráficos de convergencia para los casos en donde el grafo sí contenía un subgrafo 3-regular:
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{converge_14.png}
+	\caption{Convergencia en grafos de 14 nodos que contenían subgrafos cúbicos}
+\end{figure}
+
+
+Para los casos de pruebas con grafos de 14 nodos, la tasa de falsos positivos fue de $0.125$, y para los casos positivos el promedio de convergencia estuvo en $98.21$ iteraciones, con una desviación estándar de $155.35$. Este análisis para lo que nos sirve es para tener una idea de qué cota poner al número de iteraciones para decantarnos por el hecho de que no tenga subgrafo cúbico. Es importante aclarar que los falsos negativos se reconocieron que eran falsos usando el algoritmo de backtrack.
+
 \subsection*{Algoritmo gen\'etico para determinar si el grafo es 3-coloreable}
+
+Por otra parte la alternativa con Inteligencia Artificial para verificar si un grafo es 3-coloreable o no, fue aplicar nuevamente otro algoritmo genético. En este caso las soluciones serían una partición en 3 conjuntos, los cuales serían los colores con los que se colorea cada nodo.
+
+\begin{itemize}
+	\item Función de generación individual: Genera aleatoriamente una partición de los nodos en 3 conjuntos.
+	\item Función de selección con torneo: En cada etapa, se hace una mezcla de la población y se agrupan en parejas, varias soluciones, las cuales se evalúan con la función de fitness y la ganadora pasa a formar parte de la selección
+	\item Función de cruce de punto fijo: Se hace una bipartición de las dos soluciones padres. El hijo 1, tomaría la misma coloración del padre 1 según el primer conjunto de la bipartición, y heredaría la misma coloración del padre 2 según el segundo conjunto de la bipartición. Para el hijo 2 el proceso es análogo pero primero tomando al padre 2 y luego al padre 1.
+	\item Función de mutación: Se cambia un color aleatorio de la solución.
+	\item Función de fitness: Se contabilizan las incompatibilidad de color entre 2 nodos. Esto quiere decir que por cada par de nodos adyacentes con el mismo color, el fitness se incrementa en 1. Note que el fitness es 0 cuando el grafo es 3-coloreable.
+\end{itemize}
+
+El algoritmo genético en este caso es muy parecido al explicado anteriormente, solo diferenciándose en que la selección se hace 2 veces, con toda la población y se cruzan generando una cantidad de hijos igual que el tamaño de la población. Luego varios de los hijos son sometidos a mutación y se pasa a la siguiente etapa.
+
+Aunque tenemos forma de saber cuán efectivo es el algoritmo genético del subgrafo cúbico, otra forma de comprobar la efectividad del mismo es comparar los valores de los resultados del algoritmo genético que reconoce 3-coloreables, con el algoritmo genético del subgrafo cúbico evaluado en el mismo grafo pero con la transformación de equivalencia entre estos 2 problemas NP. Este código se encuentra anexado, pero aclaremos que la transformación genera grafos bastante grandes, como por ejemplo el que se encuentra en el notebook de Jupyter, donde un grafo de 4 vértices se transformó en un nuevo grafo de 184 vértices. Evaluar esto en los equipos que disponemos es en vano para muchos grafos, por lo tanto, se deja al lector esta comprobación. No obstante, tenga en cuenta en la sección anterior la vía con la cual se verificaba la efectividad del algoritmo genético de subgrafos cúbicos.
+
+	
 
 \subsection*{Complicando el problema, como si ya no estuviera complicado}
 Aunque el problema de determinar si un grafo tiene un subgrafo c\'ubico es un problema puramente de decisi\'on, 
 si se modifica un poco la orientaci\'on del problema se puede buscar escribir problemas que sean de optimizaci\'on 
-aunque ello implique que se pierda la reigurosidad de que el grafo tena realmente un subgrafo $3$-regular o que 
-sea necesario agreagar nuevas restricciones.\\
+aunque ello implique que se pierda la rigurosidad de que el grafo tenga realmente un subgrafo $3$-regular o que 
+sea necesario agregar nuevas restricciones.\\
 
 
 Una primera idea es la de maximizar la cantidad de v\'ertices del grafo que quedan con degree $0$ o $3$ luego de haber 
@@ -241,19 +298,19 @@ Otra idea, restringiendo m\'as el problema es, no solo forzar a que tengamos al 
 a que al menos nos quede un v\'ertice de grado $3$, esto implica que en el grafo de entrada al menos tiene que existir un v\'ertice con grado 
 mayor o igual a $3$. Por tanto tambi\'en se puede de forma greedy encontrar un valor cercano al \'optimo, si tomamos uno de los v\'ertices de grado mayor  
 o igual que $3$ en el grafo y nos quedamos con $3$ de sus aristas, con lo que cumplimos la restricci\'on de tener al menos un v\'ertice de grado $3$ y en total 
-quedar\'ian $n-3$ v\'ertices que cumplen la condici\'on de tener grado $3$ o $0$, lo cual dista en el peor caso en $3$ al rasultado \'optimo que puede llegar a ser $n$
+quedar\'ian $n-3$ v\'ertices que cumplen la condici\'on de tener grado $3$ o $0$, lo cual dista en el peor caso en $3$ al resultado \'optimo que puede llegar a ser $n$
 si tuvi\'eramos en el grafo un subgrafo $3$-regular.\\ 
 
 Una tercera idea, esta s\'i enfocada en la detecci\'on de subgrafos $3$-regulares, es dado un grafo del que sabemos tiene al menos un subgrafo $3$-regular, determinar la cardinalidad del 
-mayor subgrafo $3$-regular que tiene. Si para esta idea existiera un algoritmo polinomial que fuera un $\rho$-aproximaci\'on del \'optimo del porblema, es decir que nos devolviese un valor $M'$
+mayor subgrafo $3$-regular que tiene. Si para esta idea existiera un algoritmo polinomial que fuera un $\rho$-aproximaci\'on del \'optimo del problema, es decir que nos devolviese un valor $M'$
 que $M'\rho \geq M$, es decir fuera, en el peor caso, $\rho$ veces menor que el resultado real del tama\~no m\'aximo del subgrafo $3$-regular, entonces ocurrir\'ia lo siguiente: \\ 
 
 
-Sea $G$ un grafo del que se quiere determinar si es $3$-coloreable, tal que $|V(G)| >  \left\lceil\frac{2\rho}{5} \right\rceil $ y $G$ es conexo, si a partir de $G$, contruimos un $G'$ utilizando la 
+Sea $G$ un grafo del que se quiere determinar si es $3$-coloreable, tal que $|V(G)| >  \left\lceil\frac{2\rho}{5} \right\rceil $ y $G$ es conexo, si a partir de $G$, construimos un $G'$ utilizando la 
 reducci\'on inicial, para obtener la entrada al problema de subgrafo c\'ubico, entonces sobre $G'$ sabemos lo siguiente: 
 
 \begin{itemize}
-    \item $G'$ tinene un subgrafo c\'ubico $\Leftrightarrow $ $G$ es $3$-coloreable.
+    \item $G'$ tiene un subgrafo c\'ubico $\Leftrightarrow $ $G$ es $3$-coloreable.
     \item Si en $G'$ hay un subgrafo c\'ubico $G'[H]$ entonces: 
     \begin{itemize}
         \item $C'$ est\'a en $H$, lo que aporta $2|V(G)|$ v\'ertices.

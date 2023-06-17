@@ -29,7 +29,7 @@ def crossover(parent1, parent2, n):
     return child1, child2
 
 def mutation1(individual, n, number_of_colors):
-    probability = 0.4
+    probability = 0.5
     check = random.uniform(0, 1)
     if(check <= probability):
         position = random.randint(0, n-1)
@@ -37,7 +37,7 @@ def mutation1(individual, n, number_of_colors):
     return individual
 
 def mutation2(individual, n, number_of_colors):
-    probability = 0.2
+    probability = 0.3
     check = random.uniform(0, 1)
     if(check <= probability):
         position = random.randint(0, n-1)

@@ -52,7 +52,7 @@ def ThreeColorableB(n,set_A,set_B,set_C, adjacent_matrix, index):
         set_C.append(index)
         C3 = ThreeColorableB(n, set_A, set_B, set_C, adjacent_matrix, index+1)
         if C3: return True
-
+        set_C.pop()
     return False
 
 
@@ -64,5 +64,6 @@ def Void(set_X, adjacent_matrix):
     return True
 
 def FreeSet(set_x, y, adjacent_matrix):
-    for u in set_X:
+    for u in set_x:
         if  adjacent_matrix[u][y]: return False
+    return True
